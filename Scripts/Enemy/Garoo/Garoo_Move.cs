@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 
 namespace Battle
 {
-
+    // 近距離・遠距離・ボスの３分類があるが同一AIとあったが、仕様が固まっていくうちに、敵ごとに細かな挙動が変わることが予想されたため、クラスを分けた
     public class Garoo_Move : BaseEnemyMove
     {
         [Serializable]
@@ -15,7 +15,7 @@ namespace Battle
             public float _defaultMoveSpeed = 1f;
             public float _minRandomSpeed = 0.8f, _maxRandomSpeed = 1.2f;
 
-            [Header("��s�G�̏ꍇ�̃����_���ȍ���")]
+            [Header("飛行敵の場合のランダムな高さ")]
             public float minThetaDeg = 0f, maxThetaDeg = 180f;
             public float minPhiDeg = 0f, maxPhiDeg = 360f;
         }

@@ -1,9 +1,12 @@
-using UnityEngine;
+﻿using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Battle
 {
-    //�ߋ����E�������E�{�X�̂R���ނ�����
+    // 近距離・遠距離・ボスの３分類があるが同一AI。
+    // 全て下記ロジックで動く。
+    // ①自身の射程範囲に入るまで拠点に接近（直線最短接近・ジグザグ接近（x軸 y軸）・ランダム接近あり）
+    // ➁射程内の拠点・兵器に攻撃行動（攻撃アニメーション開始。Unityのアニメーションイベントでアニメーション後のHit判定を発生させる）
     public class EnemyMovement : MonoBehaviour, IEnemyState
     {
         [SerializeField] private string _playerTag = "Player";
@@ -72,7 +75,9 @@ namespace Battle
         }
     }
 
-
+    /// <summary>
+    /// 移動の基底クラス
+    /// </summary>
     public abstract class BaseEnemyMove : MonoBehaviour
     {
         [SerializeField] protected string _playerTag = "Player";
