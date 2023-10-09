@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using Cysharp.Threading.Tasks;
@@ -7,9 +5,9 @@ using System.Threading;
 
 namespace Battle
 {
-    public class BattleSystem : MonoBehaviour
+    public class BattleManager : MonoBehaviour
     {
-        public static BattleSystem Instance;
+        public static BattleManager Instance;
 
         private void Awake()
         {
@@ -73,6 +71,37 @@ namespace Battle
 
             foreach (var spawner in _waveSpawners) spawner.StopSpawner();
 
+        }
+
+
+        public void SpawnEnemy(int spawnCount)
+        {
+            var count = spawnCount / _waveSpawners.Length;
+            foreach (var spawner in _waveSpawners) spawner.SpawnEnemy(count);
+        }
+
+        public void UIMode(bool isUiMode)
+        {
+            if (isUiMode)
+            {
+                CursorEnable();
+            }
+            else
+            {
+                CursorDisable();
+            }
+        }
+
+        public static void CursorEnable()
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+
+        public static void CursorDisable()
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void OnDestroy()

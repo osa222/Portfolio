@@ -15,7 +15,7 @@ namespace Battle
 
         [SerializeField] private TextMeshProUGUI _waveTimer;
 
-        [SerializeField] private BattleSystem _battleSystem;
+        [SerializeField] private BattleManager _battleSystem;
 
         private void Start()
         {

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
-namespace Battle
+namespace Battle.Enemies
 {
-    // 近距離・遠距離・ボスの３分類があるが同一AIとあったが、仕様が固まっていくうちに、敵ごとに細かな挙動が変わることが予想されたため、クラスを分けた
+
     public class Garoo_Move : BaseEnemyMove
     {
         [Serializable]
@@ -15,7 +14,7 @@ namespace Battle
             public float _defaultMoveSpeed = 1f;
             public float _minRandomSpeed = 0.8f, _maxRandomSpeed = 1.2f;
 
-            [Header("飛行敵の場合のランダムな高さ")]
+            [Header("��s�G�̏ꍇ�̃����_���ȍ���")]
             public float minThetaDeg = 0f, maxThetaDeg = 180f;
             public float minPhiDeg = 0f, maxPhiDeg = 360f;
         }
@@ -24,14 +23,14 @@ namespace Battle
         [SerializeField] private MoveParameter _moveParameter;
         public GameObject navPoint;
 
-        private NavMeshAgent _navMesh;
+        private NavMeshAgent _agent;
         private float _moveSpeed;
         private Vector3 _targetPos;
 
         public override void Initialize()
         {
             _enemy = GetComponent<Enemy>();
-            TryGetComponent(out _navMesh);
+            TryGetComponent(out _agent);
 
             _moveSpeed = _moveParameter._defaultMoveSpeed * Random.Range(_moveParameter._minRandomSpeed, _moveParameter._maxRandomSpeed);
             _targetPos = _player.transform.position;
@@ -39,17 +38,26 @@ namespace Battle
 
         public override void OnStateEnter()
         {
-
+            _agent.enabled = true;
+            _agent.isStopped = false;
         }
 
-        public override void OnStateUpdate()
+        public override void OnStateExit()
+        {
+            _agent.isStopped = true;
+            _agent.enabled = false;
+        }
+
+        public override void OnUpdate()
         {
             if (_player != null)
             {
-                _navMesh.destination = _player.transform.position;
+                _agent.destination = _player.transform.position;
                 //Move();
                 //_navMesh.nextPosition = transform.position;
             }
+
+            base.OnUpdate();
 
 
 
@@ -59,21 +67,14 @@ namespace Battle
             //transform.LookAt(_player.transform);
         }
 
-
-        public override void OnStateExit()
-        {
-            _navMesh.isStopped = true;
-        }
-
-
         private void Move()
         {
 
             Vector3 nextPos;
 
-            if (_navMesh.path.corners.Length > 2)
+            if (_agent.path.corners.Length > 2)
             {
-                nextPos = _navMesh.path.corners[1];
+                nextPos = _agent.path.corners[1];
             }
             else
             {
@@ -86,12 +87,12 @@ namespace Battle
 
         private void OnDrawGizmos()
         {
-            if (_navMesh && _navMesh.enabled)
+            if (_agent && _agent.enabled)
             {
                 Gizmos.color = Color.red;
                 var prepos = transform.position;
 
-                foreach (var pos in _navMesh.path.corners)
+                foreach (var pos in _agent.path.corners)
                 {
                     Gizmos.DrawLine(prepos, pos);
                     prepos = pos;

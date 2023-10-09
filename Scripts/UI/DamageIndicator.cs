@@ -80,7 +80,6 @@ namespace Battle
 
         private IEnumerator CountDown()
         {
-            Debug.Log("CountDown");
             while (CanvasGroup.alpha < 1.0f)
             {
                 CanvasGroup.alpha += 4 * Time.deltaTime;

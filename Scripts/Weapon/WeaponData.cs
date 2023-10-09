@@ -6,6 +6,7 @@ namespace Battle
     [CreateAssetMenu]
     public class WeaponData : ScriptableObject
     {
+        public string weaponName;
         public int damage;
         public int magazineSize;
         public float shootInterval;

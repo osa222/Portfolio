@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Battle
+namespace Battle.Enemies
 {
 
     public class RandomTurning : RandomMove

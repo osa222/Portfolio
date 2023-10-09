@@ -1,32 +1,27 @@
 using UnityEngine;
 
-namespace Battle
+namespace Battle.Enemies
 {
 
-    public class EnemyIdle : MonoBehaviour, IEnemyState
+    internal class EnemyIdle : MonoBehaviour, IEnemyState
     {
         private Enemy _enemy;
         private Animator _animator;
         private EnemyStateManager _stateManager;
 
-        private void Start()
-        {
-            Initialize();
-        }
-
-        private void Initialize()
+        public void Init()
         {
             _enemy = GetComponent<Enemy>();
             _animator = GetComponent<Animator>();
             _stateManager = GetComponent<EnemyStateManager>();
         }
 
-        public void EnterState()
+        public void OnStateEnter()
         {
             //  _animator.SetTrigger("Idol");
         }
 
-        public void ExitState()
+        public void OnStateExit()
         {
 
         }

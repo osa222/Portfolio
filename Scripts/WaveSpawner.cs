@@ -12,6 +12,9 @@ namespace Battle
         [SerializeField] private int _radius;
         [SerializeField] private Transform _rootObject;
 
+        [Header("飛行する敵のランダムな高さの範囲")]
+        [SerializeField] private float _minHeight = 1f, _maxHeight = 2f;
+
         private int _nextWave = 0;
 
         public int _enemiesAlive;
@@ -32,6 +35,25 @@ namespace Battle
         public void StopSpawner()
         {
             StopCoroutine(_spawnCoroutine);
+        }
+
+        public void SpawnEnemy(int spawnCount)
+        {
+            var currentWave = _waves[_nextWave];
+
+            _enemiesAlive = currentWave.count;
+
+            for (var i = 0; i < spawnCount; i++)
+            {
+                var prefab = currentWave.spawnEnemies[Random.Range(0, currentWave.spawnEnemies.Length)];
+
+                var pos = GetPosition(prefab);
+                pos += transform.position;
+                var enemy = Instantiate(prefab, pos, Quaternion.identity);
+
+                if (_rootObject != null)
+                    enemy.transform.SetParent(_rootObject);
+            }
         }
 
         private IEnumerator GenerateEnemyCoroutine()
@@ -73,8 +95,6 @@ namespace Battle
             }
         }
 
-        [Header("飛行する敵のランダムな高さの範囲")]
-        [SerializeField] private float _最小高さ = 1f, _最大高さ = 2f;
         private Vector3 GetPosition(Enemy spawnEnemy)
         {
             // 円周上のランダムな座標0,360のランダム出して半径を考慮したときの位置を計算
@@ -97,7 +117,7 @@ namespace Battle
             }
 
             // 飛行敵の場合、高さもランダムにする
-            var y = Random.Range(_最小高さ, _最大高さ);
+            var y = Random.Range(_minHeight, _maxHeight);
             pos.y = y;
             return pos;
         }

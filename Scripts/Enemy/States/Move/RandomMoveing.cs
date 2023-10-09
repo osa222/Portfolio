@@ -4,7 +4,7 @@ using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Battle
+namespace Battle.Enemies
 {
 
     public class RandomMoveing : BaseEnemyMove
@@ -46,7 +46,7 @@ namespace Battle
             StartCoroutine(RandomMove(_cts.Token));
         }
 
-        public override void OnStateUpdate()
+        public override void OnUpdate()
         {
 
         }

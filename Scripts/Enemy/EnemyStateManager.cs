@@ -1,13 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Battle
+namespace Battle.Enemies
 {
 
-    public interface IEnemyState
+    internal interface IEnemyState
     {
-        void EnterState();
-        void ExitState();
+        void Init();
+
+        void OnStateEnter();
+        void OnStateExit();
         void OnUpdate();
     }
 
@@ -16,6 +18,8 @@ namespace Battle
         Idle,
         Attack,
         Follow,
+        TakeDamage,
+        Die,
         None
     }
 
@@ -40,12 +44,21 @@ namespace Battle
             {
                 GetComponent<EnemyIdle>(),
                 GetComponent<EnemyAttack>(),
-                GetComponent<EnemyMovement>()
+                GetComponent<BaseEnemyMove>(),
+                GetComponent<Enemy_TakeDamage>(),
+                GetComponent<Enemy_Die>()
             };
+
+            Init();
 
             ChangeState(EnemyStates.Follow);
         }
 
+        private void Init()
+        {
+            foreach (var state in _states)
+                state.Init();
+        }
 
         public void ChangeState(EnemyStates state)
         {
@@ -54,13 +67,13 @@ namespace Battle
 
             if (_currentStateHandler != null)
             {
-                _currentStateHandler.ExitState();
+                _currentStateHandler.OnStateExit();
                 _currentStateHandler = null;
             }
 
             _currentState = state;
             _currentStateHandler = _states[(int)state];
-            _currentStateHandler.EnterState();
+            _currentStateHandler.OnStateEnter();
         }
 
         private void Update()

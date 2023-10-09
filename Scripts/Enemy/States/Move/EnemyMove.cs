@@ -2,7 +2,7 @@ using System.Collections;
 using System.Threading;
 using UnityEngine;
 
-namespace Battle.GamePlay
+namespace Battle.Enemies
 {
 
     public class EnemyMove : BaseEnemyMove
@@ -20,7 +20,7 @@ namespace Battle.GamePlay
             StartCoroutine(MoveLoop(_cts.Token));
         }
 
-        public override void OnStateUpdate()
+        public override void OnUpdate()
         {
 
         }

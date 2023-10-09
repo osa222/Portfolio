@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
-namespace Battle
+namespace Battle.Enemies
 {
-    // 近距離・遠距離・ボスの３分類があるが同一AIとあったが、仕様が固まっていくうちに、敵ごとに細かな挙動が変わることが予想されたため、クラスを分けた
+
     public class Horror_Move : BaseEnemyMove
     {
         [Serializable]
@@ -15,7 +14,7 @@ namespace Battle
             public float _defaultMoveSpeed = 1f;
             public float _minRandomSpeed = 0.8f, _maxRandomSpeed = 1.2f;
 
-            [Header("飛行敵の場合のランダムな高さ")]
+            [Header("��s�G�̏ꍇ�̃����_���ȍ���")]
             public float minThetaDeg = 0f, maxThetaDeg = 180f;
             public float minPhiDeg = 0f, maxPhiDeg = 360f;
         }
@@ -39,10 +38,17 @@ namespace Battle
 
         public override void OnStateEnter()
         {
-
+            _agent.enabled = true;
+            _agent.isStopped = false;
         }
 
-        public override void OnStateUpdate()
+        public override void OnStateExit()
+        {
+            _agent.isStopped = true;
+            _agent.enabled = false;
+        }
+
+        public override void OnUpdate()
         {
             if (_player != null)
             {
@@ -51,18 +57,14 @@ namespace Battle
                 //_navMesh.nextPosition = transform.position;
             }
 
+            base.OnUpdate();
+
 
 
             //var dir = (_targetPos - transform.position).normalized;
             //transform.position += dir * _moveSpeed * Time.deltaTime;
 
             //transform.LookAt(_player.transform);
-        }
-
-
-        public override void OnStateExit()
-        {
-            _agent.isStopped = true;
         }
 
 

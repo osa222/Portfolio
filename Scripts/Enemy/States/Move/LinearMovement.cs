@@ -2,7 +2,7 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Battle
+namespace Battle.Enemies
 {
 
     public class LinearMovement : BaseEnemyMove
@@ -60,12 +60,14 @@ namespace Battle
             // 初期化時にすでに設定済み
         }
 
-        public override void OnStateUpdate()
+        public override void OnUpdate()
         {
             var dir = (_targetPos - transform.position).normalized;
             transform.position += dir * _moveSpeed * Time.deltaTime;
 
             transform.LookAt(_player.transform);
+
+            base.OnUpdate();
         }
 
         public override void OnStateExit()

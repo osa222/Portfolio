@@ -2,7 +2,7 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Battle
+namespace Battle.Enemies
 {
 
 
@@ -69,7 +69,7 @@ namespace Battle
         {
         }
 
-        public override void OnStateUpdate()
+        public override void OnUpdate()
         {
             ZigZagMove();
         }
