@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -95,6 +94,9 @@ namespace Battle
 
         private async UniTaskVoid LoopAsync(CancellationToken token)
         {
+            var currentWeapon = _weapons[_currentWeaponIndex];
+            await currentWeapon.ShowWeaponAsync(token);
+
             while (!token.IsCancellationRequested)
             {
                 if (_currentWeaponIndex != _nextWeaponIndex)
@@ -115,6 +117,7 @@ namespace Battle
             await currentWeapon.RemoveWeapon(token);
             currentWeapon.gameObject.SetActive(false);
 
+            // 格納アニメーションのみだと武器切り替えがかぶるため、少し待機
             await UniTask.Delay(500, cancellationToken: token);
 
             var nextWeapon = _weapons[_nextWeaponIndex];

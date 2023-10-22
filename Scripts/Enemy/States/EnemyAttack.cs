@@ -39,7 +39,7 @@ namespace Battle.Enemies
             Player.Instance.TakeDamage(new Damage(_enemy.EnemyParameter.ATK, gameObject, false));
         }
 
-        public void OnAnimationAttackFinish()
+        public void OnFinishAttackAnimation()
         {
             _stateManager.ChangeState(EnemyStates.Idle);
         }

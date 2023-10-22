@@ -11,6 +11,9 @@ namespace DebugMode.Battle
         private GameObject _managerGameObject;
         private BattleManager _battleManager;
 
+        public Transform laserEffect;
+        public Transform fireEffect;
+
         private void Start()
         {
             CanvasVisible(false);

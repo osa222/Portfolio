@@ -18,6 +18,9 @@ namespace DebugMode.Battle
         [SerializeField] private Button _spawnApplyButton;
         [SerializeField] private InputField _spawnCountIF;
 
+        [SerializeField] private EffectScalerView _fireView;
+        [SerializeField] private EffectScalerView _laserView;
+
         [SerializeField] private DebugManager _debugManager;
 
         private void Start()
@@ -48,6 +51,13 @@ namespace DebugMode.Battle
                     _spawnCountIF.text = "";
                 })
                 .AddTo(this);
+
+            // EffectView
+            _fireView.SetScale(_debugManager.fireEffect.localScale);
+            _laserView.SetScale(_debugManager.laserEffect.localScale);
+
+            _fireView.CurrentScale.Subscribe(x => _debugManager.fireEffect.localScale = x).AddTo(this);
+            _laserView.CurrentScale.Subscribe(x => _debugManager.laserEffect.localScale = x).AddTo(this);
         }
 
         private void Init()

@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using TMPro;
-using Battle.Game;
 
 namespace Battle
 {
@@ -26,6 +25,13 @@ namespace Battle
             TryGetComponent(out _playerWeapon);
 
             _player.CurrentHP.Subscribe(ShowHP).AddTo(this);
+
+            _player.CurrentHealthState.Subscribe(_ =>
+            {
+                // •mŽ€ó‘Ô‚È‚çA•mŽ€‰æ‘œ‚ð•\Ž¦
+                _hurtImage.enabled = _player.CurrentHealthState.Value == Player.HealthState.Dying ? true : false;
+
+            }).AddTo(this);
 
             _playerWeapon.OnWeaponChanged.Subscribe(_ =>
             {
@@ -51,12 +57,11 @@ namespace Battle
                 DI_System.CreateIndicator(damageSource);
             }
         }
+
         void ShowHP(int hp)
         {
             _hpText.text = $"HP {hp}/{_player.MaxHP}";
             _hpbar.fillAmount = (float)_player.CurrentHP.Value / _player.MaxHP;
-
-            _hurtImage.enabled = _player.CurrentHealthState.Value == Player.HealthState.Healthy ? false : true;
         }
 
     }

@@ -11,7 +11,7 @@ namespace Battle
         [SerializeField] private Game.WeaponController _weapon;
 
         private PlayerInput _input;
-        private WeaponRotetar _rotetar;
+        private PlayerCharacterController _rotetar;
 
         private void Awake()
         {

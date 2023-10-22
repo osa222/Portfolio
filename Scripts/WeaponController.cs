@@ -2,9 +2,6 @@
 using System.Threading;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Playables;
-using Cinemachine;
-
 using UniRx;
 using Cysharp.Threading.Tasks;
 
@@ -13,30 +10,26 @@ namespace Battle.Game
 
     public class WeaponController : MonoBehaviour
     {
-
-        enum State
+        enum WeaponState
         {
-            射撃可能,
-            射撃不可,
-            リロード中,
-            リキャスト中
+            Idling,
+            Preparing,
+            Reloading,
         }
 
         [Serializable]
         public class Settings
         {
-            public BaseBullet _bulletPrefab;
-            public Transform WeaponMuzzle;
-            public Transform FollowTarget;
-            public Transform LookTarget;
-            public float BulletSpreadAngle;
+            public BaseBullet bulletPrefab;
+            public Transform weaponMuzzle;
+            public float bulletSpreadAngle;
         }
 
         public WeaponData _parameter;
         public Settings _settings;
         public Weapon Weapon;
 
-        private State _state = State.射撃可能;
+        private WeaponState _state = WeaponState.Idling;
 
         public IReadOnlyReactiveProperty<int> CurrentAmmo => _currentAmmo;
         private ReactiveProperty<int> _currentAmmo = new ReactiveProperty<int>(int.MaxValue);
@@ -67,86 +60,100 @@ namespace Battle.Game
 
         private void OnEnable()
         {
-            _state = State.射撃可能;
+            _state = WeaponState.Idling;
             _animator.SetBool("IsReload", false);
         }
 
 
+        private bool _inputDown;
+
+        /// <summary>
+        /// 武器の入力をとる
+        /// </summary>
         public bool HandleShootInputs(bool inputDown)
         {
-            if (_state == State.射撃可能 && inputDown)
+            if (_state == WeaponState.Idling && inputDown)
             {
-                Shoot();
+                _inputDown = inputDown;
                 return true;
             }
             else
                 return false;
         }
 
-        private void Update()
+        // 武器の発射→リロードの流れを処理する
+        private IEnumerator LoopCoroutine()
         {
-            if (_state == State.リロード中) return;
-
             if (_currentAmmo.Value <= 0)
+                yield return Reload();
+
+            while (true)
             {
-                StartCoroutine(Reload());
-                return;
+
+                yield return null;
+
+                if (!_inputDown)
+                {
+                    continue;
+                }
+
+                _inputDown = false;
+                yield return Shoot();
+
+
+                // 弾がゼロの場合リロード
+                if (_currentAmmo.Value <= 0)
+                    yield return Reload();
+
             }
 
-            if (_state == State.リキャスト中)
-                Recast();
         }
-
-        private void Recast()
-        {
-            _currentRecastTimer += Time.deltaTime;
-            if (_currentRecastTimer >= _parameter.shootInterval)
-            {
-                _state = State.射撃可能;
-                _currentRecastTimer = 0f;
-            }
-        }
-
 
         [SerializeField] private float _objectDistance;
-        private void Shoot()
+        private IEnumerator Shoot()
         {
             if (Physics.Raycast(_cam.transform.position, _cam.transform.forward, out var hit, _objectDistance))
             {
-                _settings.WeaponMuzzle.LookAt(hit.point);
+                _settings.weaponMuzzle.LookAt(hit.point);
             }
             else
             {
-                _settings.WeaponMuzzle.LookAt(_cam.transform.position + (_cam.transform.forward * 50f));
+                _settings.weaponMuzzle.LookAt(_cam.transform.position + (_cam.transform.forward * 50f));
             }
 
             // 弾を発射する
-            var shotDir = GetShotDirectionWithinSpread(_settings.WeaponMuzzle);
-            var bullet = Instantiate(_settings._bulletPrefab, _settings.WeaponMuzzle.position, Quaternion.LookRotation(shotDir));
+            var shotDir = GetShotDirectionWithinSpread(_settings.weaponMuzzle);
+            var bullet = Instantiate(_settings.bulletPrefab, _settings.weaponMuzzle.position, Quaternion.LookRotation(shotDir));
             bullet.Shoot(new Damage(_parameter.damage, this.gameObject, false));
             _currentAmmo.Value--;
             _animator.SetTrigger("Fire");
 
-            _state = State.リキャスト中;
+            _state = WeaponState.Preparing;
 
+            // 発射間隔秒待機
+            yield return new WaitForSeconds(_parameter.shootInterval);
+
+            _state = WeaponState.Idling;
         }
 
         private IEnumerator Reload()
         {
-            _state = State.リロード中;
+            _state = WeaponState.Reloading;
             _animator.SetBool("IsReload", true);
-            yield return new WaitForSeconds(_parameter.ReloadTime);
+
+            yield return new WaitForSeconds(_parameter.reloadTime);
+
             _animator.SetBool("IsReload", false);
 
             Debug.Log("Reloading...");
 
-            _state = State.射撃可能;
+            _state = WeaponState.Idling;
             _currentAmmo.Value = _parameter.magazineSize;
         }
 
         public Vector3 GetShotDirectionWithinSpread(Transform shootTransform)
         {
-            float spreadAngleRatio = _settings.BulletSpreadAngle / 180f;
+            float spreadAngleRatio = _settings.bulletSpreadAngle / 180f;
             Vector3 spreadWorldDirection = Vector3.Slerp(shootTransform.forward, UnityEngine.Random.insideUnitSphere,
                 spreadAngleRatio);
 
@@ -155,43 +162,28 @@ namespace Battle.Game
 
         public void ShowWeapon()
         {
-            ShowWeaponAsync(default).Forget();
+            ShowWeaponAsync(this.GetCancellationTokenOnDestroy()).Forget();
         }
 
-        private async UniTaskVoid ShowWeaponAsync(CancellationToken token)
+        public async UniTask ShowWeaponAsync(CancellationToken token)
         {
-            _state = State.射撃不可;
+            _state = WeaponState.Preparing;
+
+            // 出現アニメーションの待機
             await _importSub.FirstOrDefault().ToUniTask(cancellationToken: token);
-            _state = State.射撃可能;
+            _state = WeaponState.Idling;
 
-            var brain = _cam.GetComponent<CinemachineBrain>();
 
-            // 現在アクティブなCinemachineVirtualCameraを取得
-            var virtualCamera = brain.ActiveVirtualCamera as CinemachineVirtualCamera;
-            if (virtualCamera != null)
-            {
-                virtualCamera.Follow = _settings.FollowTarget;
-                virtualCamera.LookAt = _settings.LookTarget;
-            }
+            StartCoroutine(LoopCoroutine());
         }
 
         public async UniTask RemoveWeapon(CancellationToken token)
         {
             _animator.SetTrigger("Remove");
-
-            var brain = Camera.main.GetComponent<CinemachineBrain>();
-
-            // 現在アクティブなCinemachineVirtualCameraを取得
-            var virtualCamera = brain.ActiveVirtualCamera as CinemachineVirtualCamera;
-            if (virtualCamera != null)
-            {
-                virtualCamera.Follow = null;
-                virtualCamera.LookAt = null;
-            }
-
             await _removeSub.FirstOrDefault().ToUniTask(cancellationToken: token);
         }
 
+        #region AnimationEvent
         public void CompleteImport()
         {
             _importSub.OnNext(Unit.Default);
@@ -201,7 +193,7 @@ namespace Battle.Game
         {
             _removeSub.OnNext(Unit.Default);
         }
-
+        #endregion
     }
 
 }

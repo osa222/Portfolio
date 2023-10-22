@@ -9,6 +9,9 @@ namespace Battle
     {
         public static BattleManager Instance;
 
+        [SerializeField] private string _digSceneName = "Digmode";
+        [SerializeField] private KeyCode _transitionKey = KeyCode.Escape;
+
         private void Awake()
         {
             if (Instance == null)
@@ -46,6 +49,14 @@ namespace Battle
             _waveCountRP.AddTo(this);
 
             LoopAsync(this.GetCancellationTokenOnDestroy()).Forget();
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(_transitionKey))
+            {
+                TransitionManager.LoadScene(_digSceneName, () => { });
+            }
         }
 
         private async UniTaskVoid LoopAsync(CancellationToken token)

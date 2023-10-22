@@ -1,12 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Battle.Game;
 
 namespace Battle.GamePlay
 {
-
-    public class WeaponRotetar : MonoBehaviour
+    /// <summary>
+    /// 入力を用い武器の親オブジェクトとなるRootオブジェクトをY軸X軸に回転させるクラス
+    /// </summary>
+    public class PlayerCharacterController : MonoBehaviour
     {
         private PlayerWeaponController _playerWeaponController;
 
@@ -16,6 +15,8 @@ namespace Battle.GamePlay
         private float xRotation = 0f;
         private float yRotation = 0f;
 
+        [SerializeField] private Transform _rotateY;
+        [SerializeField] private Transform _rotateX;
 
         private void Start()
         {
@@ -31,10 +32,13 @@ namespace Battle.GamePlay
             xRotation -= mouseY;
             xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
-            _playerWeaponController.CurrentWeapon.Weapon.Top.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
+            // Playerの武器などのX軸の回転を操作
+            _rotateX.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+
+            // Playerの武器などのY軸の回転を操作
             yRotation += mouseX;
-            _playerWeaponController.CurrentWeapon.Weapon.transform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
+            _rotateY.localRotation = Quaternion.Euler(0f, yRotation, 0f);
         }
 
         public void SetDirection(Vector2 dir)

@@ -1,5 +1,3 @@
-using System.Collections;
-using UnityEngine;
 using UniRx;
 using System;
 using System.Threading;

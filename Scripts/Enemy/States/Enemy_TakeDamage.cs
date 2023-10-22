@@ -32,7 +32,8 @@ namespace Battle.Enemies
 
         }
 
-        public void DamageAnimationFinish()
+        // ダメージAnimationの終了コールバック
+        public void OnFinishDamageAnimation()
         {
             _enemyStateManager.ChangeState(EnemyStates.Idle);
         }

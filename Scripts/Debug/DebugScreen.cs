@@ -21,7 +21,7 @@ namespace DebugMode.Battle
 
             _damageInput.text = _weaponData.damage.ToString();
             _speedInput.text = _weaponData.shootInterval.ToString();
-            _SpeadOfRotation.text = _weaponData.eŒû‰ñ“]‘¬“x.ToString();
+            _SpeadOfRotation.text = _weaponData.muzzleRotationSpeed.ToString();
 
             _damageInput.OnValueChangedAsObservable()
                 .Select(x =>

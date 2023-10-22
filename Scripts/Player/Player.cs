@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using Battle.Game;
@@ -19,7 +17,7 @@ namespace Battle
         }
         #endregion;
 
-        public enum HealthState { Healthy, Critical }
+        public enum HealthState { Healthy, Dying, Dead }
         public IReadOnlyReactiveProperty<int> CurrentHP => _hp;
         public IReadOnlyReactiveProperty<HealthState> CurrentHealthState => _stateRP;
 
@@ -52,7 +50,7 @@ namespace Battle
 
             _hp.Value = Mathf.Clamp(_hp.Value - damage.Value, 0, maxHP);
 
-            _stateRP.Value = _hp.Value >= 20 ? HealthState.Healthy : HealthState.Critical;
+            _stateRP.Value = _hp.Value >= 20 ? HealthState.Healthy : HealthState.Dying;
 
 
             if (_hp.Value <= 0) _isAllive = false;
