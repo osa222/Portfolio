@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 
 namespace Battle
 {
@@ -22,5 +23,29 @@ namespace Battle
 
         public float reloadTime;
         public Sprite reticleImage;
+    }
+
+    [Serializable]
+    public class MachineGunStatus
+    {
+        public float objectDistance;
+    }
+
+    [Serializable]
+    public class ShotgunStatus
+    {
+        public float radius = 1f;
+        public float 射程 = 1.0f;
+        public int 散弾数 = 150;
+        public int damage = 10;
+    }
+
+    [Serializable]
+    public class LauncherStatus
+    {
+        public GameObject launcherProjectilePrefab;
+        public float radius = 1f;
+        public float 射程 = 1.0f;
+        public int damage = 10;
     }
 }

@@ -8,7 +8,7 @@ namespace Battle
 
     public class PlayerController : MonoBehaviour
     {
-        [SerializeField] private Game.WeaponController _weapon;
+        [SerializeField] private Weapons.BaseWeapon _weapon;
 
         private PlayerInput _input;
         private PlayerCharacterController _rotetar;

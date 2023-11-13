@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Battle.Game;
@@ -5,7 +6,7 @@ using Battle.Game;
 namespace Battle
 {
 
-    public class BulletStandard : BaseBullet
+    public class BombBullet : BaseBullet
     {
         [SerializeField] private float _speed = 1f;
 
@@ -19,6 +20,7 @@ namespace Battle
         [Tooltip("発射体のルートを表す変換 (正確な衝突検出に使用)")]
         public Transform Root;
 
+        [SerializeField] private Explosion _explosionPrefab;
 
         List<Collider> m_IgnoredColliders;
         private Vector3 _LastRootPosition;
@@ -83,6 +85,9 @@ namespace Battle
 
             damageable.ApplyDamage(Damage);
 
+            var explosion = Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
+            explosion.Explode();
+
             Destroy(this.gameObject);
         }
 
@@ -108,5 +113,7 @@ namespace Battle
 
             return true;
         }
+
+
     }
 }

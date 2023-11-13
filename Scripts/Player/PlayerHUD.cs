@@ -52,15 +52,16 @@ namespace Battle
 
         private void Register(Transform damageSource)
         {
-            if (!DI_System.CheckIfObjectInSight(damageSource))
-            {
-                DI_System.CreateIndicator(damageSource);
-            }
+            DI_System.CreateIndicator(damageSource);
+            //if (!DI_System.CheckIfObjectInSight(damageSource))
+            //{
+            //    Debug.Log("UI‚ð•\Ž¦");
+            //}
         }
 
         void ShowHP(int hp)
         {
-            _hpText.text = $"HP {hp}/{_player.MaxHP}";
+            _hpText.text = $"{hp}/{_player.MaxHP}";
             _hpbar.fillAmount = (float)_player.CurrentHP.Value / _player.MaxHP;
         }
 

@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Weapon = Battle.Game.WeaponController;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
 using UniRx;
+using Battle.Weapons;
 
 namespace Battle
 {
@@ -18,19 +18,19 @@ namespace Battle
         // 1:InputEventÇÃéÊìæ
         // 2:åªç›ÇÃïêäÌÇëÄçÏ
 
-        public Weapon CurrentWeapon => _weapons[_currentWeaponIndex];
+        public BaseWeapon CurrentWeapon => _weapons[_currentWeaponIndex];
         public IObservable<Unit> OnWeaponChanged => _changeSub = new Subject<Unit>();
         private Subject<Unit> _changeSub = new Subject<Unit>();
 
         private PlayerInput _input;
 
         [SerializeField] private Transform _root;
-        [SerializeField] private List<Weapon> _weapons;
+        [SerializeField] private List<BaseWeapon> _weapons;
         private int _currentWeaponIndex = 0;
         private int _nextWeaponIndex = 0;
 
         // TODO:weaponDataÇ∆Ç¢Ç§DataÇÃÇ›Çà¯êîÇ…Ç∆ÇËGameObjectÇ∆ÇµÇƒê∂ê¨Ç∑ÇÈ
-        public void AddWeapon(Weapon weapon)
+        public void AddWeapon(BaseWeapon weapon)
         {
             _weapons.Add(weapon);
             weapon.transform.SetParent(_root);
@@ -43,7 +43,7 @@ namespace Battle
 
             foreach (Transform child in _root)
             {
-                var weapon = child.GetComponent<Weapon>();
+                var weapon = child.GetComponent<BaseWeapon>();
                 _weapons.Add(weapon);
             }
 

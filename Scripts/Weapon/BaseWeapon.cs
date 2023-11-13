@@ -4,13 +4,14 @@ using System.Collections;
 using UnityEngine;
 using UniRx;
 using Cysharp.Threading.Tasks;
+using Battle.Game;
 
-namespace Battle.Game
+namespace Battle.Weapons
 {
 
-    public class WeaponController : MonoBehaviour
+    public class BaseWeapon : MonoBehaviour
     {
-        enum WeaponState
+        protected enum WeaponState
         {
             Idling,
             Preparing,
@@ -29,15 +30,15 @@ namespace Battle.Game
         public Settings _settings;
         public Weapon Weapon;
 
-        private WeaponState _state = WeaponState.Idling;
+        protected WeaponState _state = WeaponState.Idling;
 
         public IReadOnlyReactiveProperty<int> CurrentAmmo => _currentAmmo;
-        private ReactiveProperty<int> _currentAmmo = new ReactiveProperty<int>(int.MaxValue);
+        protected ReactiveProperty<int> _currentAmmo = new ReactiveProperty<int>(int.MaxValue);
 
         private float _currentRecastTimer;
 
-        private Animator _animator;
-        private Camera _cam;
+        protected Animator _animator;
+        protected Camera _cam;
 
         private Subject<Unit> _removeSub = new Subject<Unit>();
         private Subject<Unit> _importSub = new Subject<Unit>();
@@ -109,22 +110,10 @@ namespace Battle.Game
 
         }
 
-        [SerializeField] private float _objectDistance;
-        private IEnumerator Shoot()
+        [SerializeField] protected float _objectDistance;
+        protected virtual IEnumerator Shoot()
         {
-            if (Physics.Raycast(_cam.transform.position, _cam.transform.forward, out var hit, _objectDistance))
-            {
-                _settings.weaponMuzzle.LookAt(hit.point);
-            }
-            else
-            {
-                _settings.weaponMuzzle.LookAt(_cam.transform.position + (_cam.transform.forward * 50f));
-            }
-
-            // 弾を発射する
-            var shotDir = GetShotDirectionWithinSpread(_settings.weaponMuzzle);
-            var bullet = Instantiate(_settings.bulletPrefab, _settings.weaponMuzzle.position, Quaternion.LookRotation(shotDir));
-            bullet.Shoot(new Damage(_parameter.damage, this.gameObject, false));
+            Fire();
             _currentAmmo.Value--;
             _animator.SetTrigger("Fire");
 
@@ -134,6 +123,11 @@ namespace Battle.Game
             yield return new WaitForSeconds(_parameter.shootInterval);
 
             _state = WeaponState.Idling;
+        }
+
+        protected virtual void Fire()
+        {
+
         }
 
         private IEnumerator Reload()

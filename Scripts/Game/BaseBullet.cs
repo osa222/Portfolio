@@ -1,6 +1,7 @@
 using UnityEngine;
+using Battle.Game;
 
-namespace Battle.Game
+namespace Battle
 {
 
     public abstract class BaseBullet : MonoBehaviour
